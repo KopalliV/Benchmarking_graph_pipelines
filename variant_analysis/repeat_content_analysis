@@ -1,0 +1,19 @@
+#making blast database
+makeblastdb -in ../../repeats/Sbicolor_454_v3.0.1.fa.mod.EDTA.TElib.fa -dbtype nucl -out repeats_db
+
+#extracting fasta from vcf
+awk 'BEGIN {FS="\t"; OFS="\t"} !/^#/ {print ">"$1"_"$2"_"$3"\n"$4}' graph.vcf | sed 's/>/_/g' | sed 's/^_/>/g' | sed 's/__/_/g' > graph_Svs.fasta
+
+#removing troublesome '<'  from fasta header 
+sed 's/</_/g' graph_Svs.fasta > graph_Svs.filt.fasta
+
+#Run BLAST
+
+blastn -query graph_Svs.filt.fasta -db repeats_db -outfmt "6 qseqid sseqid qstart qend sstart send gaps gapopen pident length evalue qcovs qcovhsp" -max_target_seqs 1 -out graph_repeats_blastn.txt
+
+#sorting based on qcoverage and keeping only best hits
+sort -k1,1 -k12,12nr graph_repeats_blastn.txt | awk '!seen[$1]++' > graph_best_hits.txt
+
+#further filtering based on qcoverage above 80
+awk '$(NF-1) >= 80' graph_best_hits.txt > graph_filt_besthits.txt
+

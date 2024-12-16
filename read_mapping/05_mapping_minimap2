@@ -1,0 +1,29 @@
+#!/bin/bash
+# Step 5: Map reads to the linear reference extracted from the graph
+
+# Extract linear references from the graph
+vg paths -F -p input_data/path.list -x merged_graph.gbz > linear_reference.fa
+
+# Update the graph with reference paths
+vg gbwt -Z \
+  --set-reference Chr01_Sbiv3.0 \
+  --set-reference Chr02_Sbiv3.0 \
+  --set-reference Chr03_Sbiv3.0 \
+  --set-reference Chr04_Sbiv3.0 \
+  --set-reference Chr05_Sbiv3.0 \
+  --set-reference Chr06_Sbiv3.0 \
+  --set-reference Chr07_Sbiv3.0 \
+  --set-reference Chr08_Sbiv3.0 \
+  --set-reference Chr09_Sbiv3.0 \
+  --set-reference Chr10_Sbiv3.0 \
+  --gbz-format -g updated_graph.gbz merged_graph.gbz
+
+# Map simulated reads to the linear reference with Minimap2
+minimap2 -ax sr --secondary=no linear_reference.fa simulated_reads.fastq > minimap_output.sam
+
+# Filter unmapped reads
+awk '/^@/ || $3 != "*"' minimap_output.sam > filtered_minimap.sam
+
+# Inject the filtered mappings back into the graph
+vg inject -x updated_graph.gbz filtered_minimap.sam > minimap_mappings.gam
+

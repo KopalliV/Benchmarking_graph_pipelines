@@ -1,0 +1,3 @@
+#!/bin/bash
+# Generate indexes for VG Giraffe mapping
+vg autoindex -p merged_graph -w giraffe -g merged_graph.gfa -T ./temp_indexes/

@@ -1,0 +1,5 @@
+#!/bin/bash
+# Simulate reads using VG Sim
+vg sim -r -x merged_graph.gfa -n 1000000 -l 150 \ -a -s 12345 -e 0.0024 -i 0.00029 -p 570 -v 165 > simulated_reads.gam
+# Convert GAM file to FASTQ format
+vg view -X -a simulated_reads.gam > simulated_reads.fastq

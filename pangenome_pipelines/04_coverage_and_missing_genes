@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Directories and Files
+WORK_DIR="/vol/agcpgl/vkopalli/sorghum/pggb/real_data/map/missing"
+INPUT_DIR="/path/to/graph_files"  # Path to graph input files
+REFERENCE_FASTA="ref.fasta"  # Path to the reference genome FASTA file
+REFERENCE_GFF="ref.annotations.gff3"  # Path to the reference gene annotations GFF file
+
+# List of assemblies to process
+ASSEMBLY_NAMES=("assembly1" "assembly2" "assembly3")
+
+# Extract FASTA from graph
+for ASSEMBLY in "${ASSEMBLY_NAMES[@]}"
+do
+    # Extract all paths in the graph to FASTA
+    odgi paths -i "${INPUT_DIR}/graph.gfa" -f > "${INPUT_DIR}/graph.fasta"
+
+    # Extract FASTA for every assembly using grep
+    grep -A 1 "$ASSEMBLY" "${INPUT_DIR}/graph.fasta" > "${ASSEMBLY}.graph.fasta"
+done
+
+# Missing Gene Analysis using Liftoff
+for ASSEMBLY in "${ASSEMBLY_NAMES[@]}"
+do
+    # Input FASTA files for the assembly
+    ASSEMBLY_FASTA="${ASSEMBLY}.actual.fasta"
+    GRAPH_FASTA="${ASSEMBLY}.graph.fasta"
+
+    # Run Liftoff to compare the assembly to the reference and generate gene annotations
+    liftoff -g "$REFERENCE_GFF" -o "${ASSEMBLY}_liftoff.gff3" -u "unmapped_features.${ASSEMBLY}.txt" "$ASSEMBLY_FASTA" "$REFERENCE_FASTA"
+
+    # Run Liftoff with the graph-based assembly
+    liftoff -g "${ASSEMBLY}_liftoff.gff3" -o "${ASSEMBLY}.graph.gff3" -u "unmapped_features.${ASSEMBLY}.graph.txt" "$GRAPH_FASTA" "$ASSEMBLY_FASTA"
+done
+
+# Coverage Analysis using Minimap2
+for ASSEMBLY in "${ASSEMBLY_NAMES[@]}"
+do
+    ASSEMBLY_FASTA="${ASSEMBLY}.actual.fasta"
+    GRAPH_FASTA="${ASSEMBLY}.graph.fasta"
+
+    minimap2 -a -x asm20 "$ASSEMBLY_FASTA" "$GRAPH_FASTA" -t 4 -I 8G > "${ASSEMBLY}_alignment.asm20.sam"
+
+    samtools view -Sb "${ASSEMBLY}_alignment.asm20.sam" | samtools sort -o "${ASSEMBLY}_alignment.asm20.sorted.bam"
+
+    samtools coverage "${ASSEMBLY}_alignment.asm20.sorted.bam" > "${ASSEMBLY}_coverage.txt"
+done
+

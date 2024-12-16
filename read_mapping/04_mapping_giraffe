@@ -1,0 +1,8 @@
+#!/bin/bash
+# Map reads using VG Giraffe
+vg giraffe -t 16 -p -Z merged_graph.giraffe.gbz \ -m merged_graph.min -d merged_graph.dist \
+  -f simulated_reads.fastq > giraffe_sim_mappings.gam
+
+#if mapping with paired-end real-world reads
+
+vg giraffe -t 16 -p -Z merged_graph.giraffe.gbz \ -m merged_graph.min -d merged_graph.dist \ -f real_world_1.fq -f real_world_2.fq > giraffe_real_mappings.gam
