@@ -2,5 +2,6 @@
 # Merge individual chromosome GFA files into a unified graph
 
 # Using ODGI for GFA merging
-for gfa in input_data/graph_files/*.gfa; do og_file="${gfa%.gfa}.og" odgi build -g "$gfa" -o "$og_file" -s -t 16 done odgi squeeze -f <(ls input_data/graph_files/*.og) -o merged_graph.og -t 16
+for gfa in input_data/graph_files/*.gfa; do og_file="${gfa%.gfa}.og" odgi build -g "$gfa" -o "$og_file" -s -t 16 done 
+odgi squeeze -f <(ls input_data/graph_files/*.og) -o merged_graph.og -t 16
 odgi view -i merged_graph.og -g -t 16 > merged_graph.gfa
