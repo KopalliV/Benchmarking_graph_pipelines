@@ -13,7 +13,7 @@ done
 for dir in ChromosomeDirectories/*; do
     seq_file="$dir/${dir}_seq_file.txt"
     output_dir="$dir/output"
-    cactus-pangenome "$dir/json" "$seq_file" \
+    cactus-pangenome "$dir/js" "$seq_file" \
         --outDir "$output_dir" \
         --outName "${dir}_output" \
         --reference "${dir}_reference" \
