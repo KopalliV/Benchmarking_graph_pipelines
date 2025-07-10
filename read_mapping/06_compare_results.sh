@@ -17,7 +17,7 @@ awk 'NR>1 {aligned[$2]++} NR>1&&$1==1{correct[$2]++}
 sort -nrk1,1 temp_aligned_giraffe_correct.tsv > sorted_alignment_giraffe_rates.tsv
 
 # Compute cumulative statistics
-wk '{OFS="\t"; cum_aligned+=$2; cum_correct+=$3; print $1, cum_aligned, cum_correct}' sorted_alignment_giraffe_rates.tsv >> giraffe_cumulative_rates.tsv
+awk '{OFS="\t"; cum_aligned+=$2; cum_correct+=$3; print $1, cum_aligned, cum_correct}' sorted_alignment_giraffe_rates.tsv >> giraffe_cumulative_rates.tsv
 
 ##Minimap2
 
