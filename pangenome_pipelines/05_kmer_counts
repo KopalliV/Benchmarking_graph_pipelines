@@ -1,0 +1,33 @@
+
+#!/bin/bash
+
+set -euo pipefail
+
+ref="ref.fasta"
+busco_table="full_table.tsv" 
+
+#full_table.tsv is a BUSCO output file listing each gene's status (e.g., Complete, Duplicated), coordinates, and other metadata used to assess genome completeness.
+
+awk 'BEGIN{OFS="\t"} !/^#/ && ($2=="Complete" || $2=="Duplicated") {
+    start=($4 < $5 ? $4-1 : $5-1);
+    end=($4 > $5 ? $4 : $5);
+    print $3, start, end, $1, ".", $6
+}' "$busco_table" > complete_buscos.bed
+
+bedtools getfasta -fi "$ref" -bed complete_buscos.bed -name -s -fo complete_buscos_cds.fa
+
+awk '/^>/ {h=$0; next} {
+    for(i=1; i<=length($0)-20; i++) {
+        print h"_"i; print substr($0,i,21)
+    }
+}' complete_buscos_cds.fa > busco_21mers.fa
+
+bwa index "$ref"
+bwa aln "$ref" busco_21mers.fa > busco_21mers.sai
+bwa samse "$ref" busco_21mers.sai busco_21mers.fa > busco_21mers.sam
+
+mkdir -p uniq_ids multi_ids
+
+base=busco_21mers
+grep -v '^@' "${base}.sam" | awk '$0 ~ /X0:i:1/ {print $1}' | sort | uniq > "uniq_ids/${base}_uniq.txt"
+grep -v '^@' "${base}.sam" | awk '$0 ~ /X0:i:[^1]/ {print $1}' | sort | uniq > "multi_ids/${base}_multi.txt"
