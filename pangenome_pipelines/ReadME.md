@@ -11,3 +11,5 @@ Scripts: -
 `03_pggb.sh`: Constructs pangenomes with PGGB, runs Panacus for analysis, performs variant calling, and benchmarks results with Truvari.
 
 `04_coverage_and_missing_genes.sh`: Analyzes coverage and missing genes using Minimap2 and Liftoff.
+
+`05_kmer_counts`: Extracts complete BUSCO genes, generates 21-mers from their CDS, maps them to both the reference and graph.flatten.fasta using BWA, and classifies mappings as unique or multi-copy.
