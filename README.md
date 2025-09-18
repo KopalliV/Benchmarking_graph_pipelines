@@ -2,7 +2,7 @@
 
 **Introduction**
 
-This repository contains scripts used to perform analyses in the paper "Towards a Standardized Framework for Pangenome Graph Evaluation: Assessing Sorghum Pangenome Variation Graph Construction from Multiple Assemblies" It is divided into the following subdirectories, each with their own README:
+This repository contains scripts used to perform analyses in the paper "Towards a Standardized Framework for Pangenome Graph Evaluation: Assessing Crop Plant Pangenome Variation Graph Construction from Multiple Assemblies" It is divided into the following subdirectories, each with their own README:
 
 `pangenome_pipelines`: Scripts used for building and assembling the sorghum pangenome from multiple genomes.
 
